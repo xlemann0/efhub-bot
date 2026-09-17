@@ -436,7 +436,6 @@ async def process_new_price(message: types.Message, state: FSMContext):
         
         updated_caption = "\n".join(updated_lines)
         
-        # Asl xabarni tahrirlaymiz
         try:
             if photo:
                 await bot.edit_message_caption(chat_id=CHANNEL_USERNAME, message_id=msg_id, caption=updated_caption, parse_mode="HTML")
@@ -445,7 +444,6 @@ async def process_new_price(message: types.Message, state: FSMContext):
         except Exception as e:
             logging.error(f"Asl xabarni tahrirlashda xato: {e}")
 
-        # Faqat #FAST va faqat yangi narxning o'zi (rasmsiz va eski narxsiz, faqat reply)
         fast_caption = f"#FAST ⚡️\n\n{new_price} so'm"
         
         try:
@@ -621,25 +619,28 @@ async def process_sotish_comment(message: types.Message, state: FSMContext):
     data = await state.get_data()
     garants_text = get_garants_text()
     
+    user = message.from_user
+    user_link = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
+    
     caption = (
         f"#SOTILADI\n\n"
         f"💴 Narx: {data.get('price')} so'm\n"
         f"♻️ Obmen ko'rish: {data.get('obmen')}\n"
         f"⚠️ Google & Game Center: {data.get('google')}\n"
-        f"☎️ Murojaat: @ef_admistrator\n\n"
+        f"☎️ Murojaat: {user_link}\n\n"
         f"📋 Ma'lumot:\n{data.get('comment')}\n\n"
         f"♻️OLDI SOTDI GARANT ADMINLAR\n"
         f"{garants_text}\n\n"
         f"🔻ELON BERISH UCHUN BOTIMIZ\n"
-        f"      @eFhubShop_Bot"
+        f"     @eFhubShop_Bot"
     )
     await state.update_data(final_text=caption)
     await state.set_state(ElonState.confirm)
     
     if data.get("photo"):
-        await message.answer_photo(photo=data.get("photo"), caption=caption)
+        await message.answer_photo(photo=data.get("photo"), caption=caption, parse_mode="HTML")
     else:
-        await message.answer(caption)
+        await message.answer(caption, parse_mode="HTML")
     await message.answer("✅ E'lon yuborishga tayyor!", reply_markup=confirm_keyboard())
 
 @dp.callback_query(lambda c: c.data == "olish")
@@ -669,23 +670,26 @@ async def process_buy_comment(message: types.Message, state: FSMContext):
     garants_text = get_garants_text()
     tag = "#OLINADI #FAQAT_TOZA" if data.get('buy_google') == "FAQAT_TOZA" else "#OLINADI"
     
+    user = message.from_user
+    user_link = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
+    
     caption = (
         f"{tag}\n\n"
         f"💴 BUDJET: {data.get('budget')} so'm\n"
         f"📋 Ma'lumot:\n{data.get('comment')}\n\n"
-        f"☎️ Murojaat: @ef_admistrator\n\n"
+        f"☎️ Murojaat: {user_link}\n\n"
         f"♻️OLDI SOTDI GARANT ADMINLAR\n"
         f"{garants_text}\n\n"
         f"🔻ELON BERISH UCHUN BOTIMIZ\n"
-        f"      @eFhubShop_Bot"
+        f"     @eFhubShop_Bot"
     )
     await state.update_data(final_text=caption)
     await state.set_state(ElonState.confirm)
     
     if data.get("photo"):
-        await message.answer_photo(photo=data.get("photo"), caption=caption)
+        await message.answer_photo(photo=data.get("photo"), caption=caption, parse_mode="HTML")
     else:
-        await message.answer(caption)
+        await message.answer(caption, parse_mode="HTML")
     await message.answer("✅ E'lon yuborishga tayyor!", reply_markup=confirm_keyboard())
 
 @dp.callback_query(lambda c: c.data == "send_to_channel", StateFilter(ElonState.confirm))
