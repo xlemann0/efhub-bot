@@ -619,7 +619,7 @@ async def process_sotish_comment(message: types.Message, state: FSMContext):
     data = await state.get_data()
     garants_text = get_garants_text()
     
-    # Foydalanuvchi manzilini (murojaat uchun) tayyorlaymiz
+    # Foydalanuvchining bosiladigan havolasi (profil linki)
     user = message.from_user
     contact_link = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
     
@@ -671,7 +671,7 @@ async def process_buy_comment(message: types.Message, state: FSMContext):
     garants_text = get_garants_text()
     tag = "#OLINADI #FAQAT_TOZA" if data.get('buy_google') == "FAQAT_TOZA" else "#OLINADI"
     
-    # Foydalanuvchi manzilini (murojaat uchun) tayyorlaymiz
+    # Foydalanuvchining bosiladigan havolasi (profil linki)
     user = message.from_user
     contact_link = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
     
@@ -731,7 +731,6 @@ async def send_to_channel_handler(call: types.CallbackQuery, state: FSMContext):
     await state.clear()
 
 async def main():
-    # Bot uzluksiz (24/7) ishlashi uchun polling ishga tushiriladi
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
