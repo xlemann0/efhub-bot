@@ -561,7 +561,10 @@ async def check_payment_handler(call: types.CallbackQuery):
 @dp.callback_query(lambda c: c.data == "cancel")
 async def cancel_handler(call: types.CallbackQuery, state: FSMContext):
     await state.clear()
-    await call.message.delete()
+    try:
+        await call.message.delete()
+    except Exception:
+        pass
     await call.message.answer("Jarayon bekor qilindi. ❌", reply_markup=main_menu())
 
 @dp.callback_query(lambda c: c.data == "sotish")
@@ -570,10 +573,13 @@ async def start_sotish_process(call: types.CallbackQuery, state: FSMContext):
     sotish_photo = get_setting("sotish_default_photo")
     
     if sotish_photo:
-        await call.message.answer_photo(
-            photo=sotish_photo, 
-            caption="💡 **E'tibor bering!** Akkount rasmini xuddi shu ko'rinishda (namunadagidek) skrinshot qilib yuborishingiz kerak."
-        )
+        try:
+            await call.message.answer_photo(
+                photo=sotish_photo, 
+                caption="💡 **E'tibor bering!** Akkount rasmini xuddi shu ko'rinishda (namunadagidek) skrinshot qilib yuborishingiz kerak."
+            )
+        except Exception:
+            pass
     
     await state.set_state(ElonState.photo)
     await call.message.answer("📸 Endi o'z akkountingizning rasmini yuboring:")
@@ -591,7 +597,10 @@ async def process_google(call: types.CallbackQuery, state: FSMContext):
     status = "Ulangan" if call.data == "yes" else "Toza"
     await state.update_data(google=status)
     await state.set_state(ElonState.obmen_choice)
-    await call.message.edit_text("♻️ Ushbu akkountingizga obmen ko'rasizmi?", reply_markup=yes_no_keyboard())
+    try:
+        await call.message.edit_text("♻️ Ushbu akkountingizga obmen ko'rasizmi?", reply_markup=yes_no_keyboard())
+    except Exception:
+        await call.message.answer("♻️ Ushbu akkountingizga obmen ko'rasizmi?", reply_markup=yes_no_keyboard())
 
 @dp.callback_query(lambda c: c.data in ["yes", "no"], StateFilter(ElonState.obmen_choice))
 async def process_obmen(call: types.CallbackQuery, state: FSMContext):
@@ -600,7 +609,10 @@ async def process_obmen(call: types.CallbackQuery, state: FSMContext):
     await state.set_state(ElonState.price_type)
     
     builder = InlineKeyboardBuilder().button(text="📝 Narxini kiritish", callback_data="enter_price")
-    await call.message.edit_text("📋 Akkount narxini kiriting:", reply_markup=builder.as_markup())
+    try:
+        await call.message.edit_text("📋 Akkount narxini kiriting:", reply_markup=builder.as_markup())
+    except Exception:
+        await call.message.answer("📋 Akkount narxini kiriting:", reply_markup=builder.as_markup())
 
 @dp.callback_query(lambda c: c.data == "enter_price", StateFilter(ElonState.price_type))
 async def request_price(call: types.CallbackQuery, state: FSMContext):
@@ -661,7 +673,10 @@ async def process_buy_google(call: types.CallbackQuery, state: FSMContext):
     google_status = "FAQAT_TOZA" if call.data == "no" else "ULANGAN"
     await state.update_data(buy_google=google_status)
     await state.set_state(ElonState.buy_comment)
-    await call.message.edit_text("📝 Qanday akkaunt kerakligini to'liq yozing:")
+    try:
+        await call.message.edit_text("📝 Qanday akkaunt kerakligini to'liq yozing:")
+    except Exception:
+        await call.message.answer("📝 Qanday akkaunt kerakligini to'liq yozing:")
 
 @dp.message(ElonState.buy_comment)
 async def process_buy_comment(message: types.Message, state: FSMContext):
@@ -719,7 +734,10 @@ async def send_to_channel_handler(call: types.CallbackQuery, state: FSMContext):
         
         builder = InlineKeyboardBuilder().button(text="E’lonimni ko'rish 👁", url=post_link)
         
-        await call.message.delete()
+        try:
+            await call.message.delete()
+        except Exception:
+            pass
         await call.message.answer("E'loningiz muvaffaqiyatli kanalga joylandi! ✅", reply_markup=main_menu())
         await call.message.answer("Quyidagi tugma orqali e'loningizni ko'rishingiz mumkin:", reply_markup=builder.as_markup())
         
